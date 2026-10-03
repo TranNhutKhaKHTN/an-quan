@@ -6,7 +6,7 @@ import { useSound } from "@/features/audio/soundStore";
 import { useMusic } from "@/features/audio/musicStore";
 import { preloadSounds, unlockSounds } from "@/features/game/sound";
 
-const VOLUME = 0.3;
+const VOLUME = 0.15;
 
 /**
  * Looping background music for the whole app. It lives in the root layout, so it keeps playing
