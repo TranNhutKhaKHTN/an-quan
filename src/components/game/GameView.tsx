@@ -26,6 +26,8 @@ export interface GameViewProps {
   players?: PlayerInfo[];
   youSeat?: number | null;
   secondsLeft?: number | null;
+  /** Full length of a turn, for the countdown bar. */
+  turnSeconds?: number;
   /** One line under the board when no house is selected. */
   statusText: string;
   /** Header content (mode switcher, room code...). */
@@ -77,7 +79,7 @@ export function GameView(p: GameViewProps) {
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 lg:grid lg:grid-cols-[1fr_320px] lg:items-start">
         <section className="flex flex-col gap-4">
           <header className="flex items-center justify-between gap-2">
-            <Link href="/" className="text-lg font-extrabold text-[#6b4423]">
+            <Link href="/" className="on-bg text-lg font-extrabold text-[#6b4423]">
               Ô Ăn Quan
             </Link>
             {p.headerExtra}
@@ -96,6 +98,7 @@ export function GameView(p: GameViewProps) {
             floaters={p.frame.floaters}
             onSelect={(cell) => p.onSelect(p.selected === cell ? null : cell)}
             secondsLeft={p.secondsLeft}
+            turnSeconds={p.turnSeconds}
             players={players}
           />
 
@@ -108,7 +111,7 @@ export function GameView(p: GameViewProps) {
                 hint={`${turnName}: chọn hướng rải từ ô ${p.selected}`}
               />
             ) : (
-              <p className="text-center text-sm text-muted-foreground" aria-live="polite">
+              <p className="on-bg mx-auto w-fit max-w-full text-center text-sm text-[#4a3320]" aria-live="polite">
                 {p.statusText}
               </p>
             )}

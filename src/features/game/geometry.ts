@@ -32,7 +32,7 @@ export function boardGeometry(config: RuleConfig): BoardGeometry {
   const positions: Point[] = [];
 
   if (n === 2) {
-    const aspect = 1.75;
+    const aspect = 1.4;
     const left = 9;
     const right = 91;
     const span = (right - left) / stride;

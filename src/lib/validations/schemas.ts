@@ -21,7 +21,7 @@ export const createRoomBody = z.object({
   displayName,
   avatar,
   isPublic: z.boolean().default(false),
-  turnSeconds: z.union([z.literal(0), z.literal(30), z.literal(60), z.literal(90)]).default(0),
+  turnSeconds: z.union([z.literal(0), z.literal(10), z.literal(30), z.literal(60), z.literal(90)]).default(0),
   idempotencyKey: idempotencyKey.optional(),
 });
 

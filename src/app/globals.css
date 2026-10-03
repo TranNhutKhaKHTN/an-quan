@@ -155,9 +155,25 @@
 }
 
 body {
-  background:
-    radial-gradient(1200px 600px at 50% -10%, #fff8e1 0%, transparent 70%),
-    var(--background);
+  background-color: #b07a45; /* shown until the image loads */
+}
+
+/* Game-wide background art. A fixed layer (not background-attachment: fixed, which iOS ignores). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url("/images/bg.jpg") center / cover no-repeat;
+}
+
+/* Text that sits straight on the artwork gets a soft cream plate so it stays readable. */
+.on-bg {
+  background: rgb(255 250 240 / 0.82);
+  border-radius: 1rem;
+  padding: 0.25rem 0.9rem;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 10px rgb(60 35 10 / 0.18);
 }
 
 .wood-board {
@@ -165,6 +181,7 @@ body {
     repeating-linear-gradient(95deg, rgb(0 0 0 / 0.035) 0 2px, transparent 2px 9px),
     linear-gradient(135deg, var(--wood-1), var(--wood-2));
   box-shadow:
+    0 0 0 3px rgb(255 248 225 / 0.55),
     inset 0 2px 0 rgb(255 255 255 / 0.25),
     inset 0 -6px 14px rgb(0 0 0 / 0.25),
     0 14px 30px -10px rgb(60 35 10 / 0.55);

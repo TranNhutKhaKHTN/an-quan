@@ -23,6 +23,7 @@ interface Props {
   floaters: Floater[];
   onSelect: (cell: number) => void;
   secondsLeft?: number | null;
+  turnSeconds?: number;
   players?: PlayerInfo[];
 }
 
@@ -38,6 +39,7 @@ export function GameBoard({
   floaters,
   onSelect,
   secondsLeft,
+  turnSeconds,
   players,
 }: Props) {
   const layout = useMemo(() => buildLayout(config), [config]);
@@ -55,7 +57,7 @@ export function GameBoard({
         className="absolute -translate-x-1/2 -translate-y-1/2"
         style={{ left: `${geo.center.x}%`, top: `${geo.center.y}%` }}
       >
-        <TurnIndicator seat={turn} finished={finished} moveCount={moveCount} secondsLeft={secondsLeft} players={players} />
+        <TurnIndicator seat={turn} finished={finished} moveCount={moveCount} secondsLeft={secondsLeft} turnSeconds={turnSeconds} players={players} />
       </div>
 
       {layout.map((l) => {

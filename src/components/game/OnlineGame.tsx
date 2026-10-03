@@ -92,7 +92,7 @@ export function OnlineGame({ code }: { code: string }) {
 
   if (room.load === "notfound")
     return (
-      <div className="space-y-3 py-20 text-center">
+      <div className="on-bg mx-auto my-20 w-fit space-y-3 py-6 text-center">
         <p className="font-semibold">Không tìm thấy phòng {code}</p>
         <Link href="/" className="underline">
           Về trang chủ
@@ -102,7 +102,7 @@ export function OnlineGame({ code }: { code: string }) {
   const shown = g.shown;
   if (!snap || !session || !shown || !snap.you)
     return (
-      <div className="p-10 text-center text-muted-foreground" role="status">
+      <div className="on-bg mx-auto my-10 w-fit p-4 text-center text-[#4a3320]" role="status">
         {room.error ?? "Đang tải ván đấu…"}
       </div>
     );
@@ -151,6 +151,7 @@ export function OnlineGame({ code }: { code: string }) {
       players={players}
       youSeat={mySeat}
       secondsLeft={secondsLeft}
+      turnSeconds={snap.room.settings.turnSeconds}
       statusText={statusText}
       banner={
         <>

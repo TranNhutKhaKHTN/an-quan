@@ -33,7 +33,7 @@ export function HomeActions() {
         </Button>
       </div>
       {showOnline && !configured && (
-        <p className="max-w-md text-xs text-muted-foreground">
+        <p className="on-bg max-w-md text-xs text-[#5a3d22]">
           Chơi online cần cấu hình Supabase (xem README). Bạn vẫn có thể chơi cùng bạn trên một máy ở trên.
         </p>
       )}

@@ -17,7 +17,7 @@ interface DirectionProps {
 export function DirectionPicker({ angles, disabled, onPick, hint }: DirectionProps) {
   return (
     <div className="flex flex-col items-center gap-2" aria-live="polite">
-      <p className="text-sm text-muted-foreground">{hint}</p>
+      <p className="on-bg text-sm text-[#4a3320]">{hint}</p>
       <div className="flex gap-3">
         {([-1, 1] as Direction[]).map((d) => (
           <Button
@@ -63,7 +63,7 @@ export function GameControls({ soundOn, canSurrender, onToggleSound, onRules, on
       <Button variant="destructive" className={cls} onClick={onSurrender} disabled={!canSurrender}>
         <Flag /> Đầu hàng
       </Button>
-      <Link href="/" className="inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium hover:bg-muted">
+      <Link href="/" className="on-bg inline-flex h-10 items-center gap-1.5 text-sm font-medium hover:bg-[#fffaf0]">
         <LogOut className="size-4" /> Thoát
       </Link>
     </div>

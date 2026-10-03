@@ -16,11 +16,11 @@ export default function Home() {
           ♜
         </div>
         <h1 className="text-5xl font-extrabold tracking-tight text-[#6b4423] sm:text-6xl">Ô Ăn Quan</h1>
-        <p className="mt-2 text-muted-foreground">Trò chơi dân gian Việt Nam cho 2, 3 hoặc 4 người</p>
+        <p className="on-bg mt-3 inline-block text-[#5a3d22]">Trò chơi dân gian Việt Nam cho 2, 3 hoặc 4 người</p>
       </div>
 
       <section className="w-full space-y-3" aria-label="Chơi với máy">
-        <h2 className="text-lg font-bold text-[#6b4423]">Chơi với máy</h2>
+        <h2 className="on-bg inline-block text-lg font-bold text-[#6b4423]">Chơi với máy</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           {modes.map((m) => (
             <Link
@@ -39,7 +39,7 @@ export default function Home() {
       </section>
 
       <section className="w-full space-y-3" aria-label="Chơi chung một máy">
-        <h2 className="text-lg font-bold text-[#6b4423]">Chơi chung một máy</h2>
+        <h2 className="on-bg inline-block text-lg font-bold text-[#6b4423]">Chơi chung một máy</h2>
         <div className="grid gap-3 sm:grid-cols-3">
         {modes.map((m) => (
           <Link

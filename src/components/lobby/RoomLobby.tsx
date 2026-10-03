@@ -24,7 +24,7 @@ function Slots({ snap, presence }: { snap: RoomSnapshot; presence: Set<number> |
         const p = snap.players.find((x) => x.seat === seat);
         if (!p)
           return (
-            <li key={seat} className="flex h-16 items-center justify-center rounded-2xl border-2 border-dashed text-sm text-muted-foreground">
+            <li key={seat} className="flex h-16 items-center justify-center rounded-2xl border-2 border-dashed bg-[#fffaf0]/70 text-sm text-[#5a3d22]">
               <span className="animate-pulse">Đang chờ người chơi…</span>
             </li>
           );
@@ -155,19 +155,19 @@ export function RoomLobby({ code }: { code: string }) {
   const shell = (children: React.ReactNode) => (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 px-4 py-6">
       <header className="flex items-center justify-between">
-        <Link href="/" className="text-lg font-extrabold text-[#6b4423]">
+        <Link href="/" className="on-bg text-lg font-extrabold text-[#6b4423]">
           Ô Ăn Quan
         </Link>
-        <span className="text-sm text-muted-foreground">Phòng chờ</span>
+        <span className="on-bg text-sm text-[#5a3d22]">Phòng chờ</span>
       </header>
       {children}
     </main>
   );
 
-  if (room.load === "loading") return shell(<p className="py-16 text-center text-muted-foreground">Đang tải phòng…</p>);
+  if (room.load === "loading") return shell(<p className="on-bg mx-auto my-16 w-fit text-center text-[#4a3320]">Đang tải phòng…</p>);
   if (room.load === "notfound")
     return shell(
-      <div className="space-y-3 py-12 text-center">
+      <div className="on-bg space-y-3 !rounded-2xl py-8 text-center">
         <p className="text-4xl">🔍</p>
         <p className="font-semibold">Không tìm thấy phòng {code}</p>
         <p className="text-sm text-muted-foreground">Phòng có thể đã đóng hoặc mã chưa đúng.</p>
@@ -189,20 +189,20 @@ export function RoomLobby({ code }: { code: string }) {
     <>
       <ConnectionBanner connection={room.connection} error={room.error} onRetry={room.refresh} />
       <ShareRoom code={code} />
-      <div className="flex items-center justify-between text-sm">
+      <div className="on-bg flex items-center justify-between text-sm">
         <span className="font-medium">{MODE_NAMES[snap.room.playerLimit]}</span>
         <span className="tabular-nums" data-testid="player-count">
           {snap.players.length}/{snap.room.playerLimit} người
         </span>
       </div>
-      <p className="-mt-2 text-xs text-muted-foreground">
+      <p className="on-bg -mt-2 w-fit text-xs text-[#5a3d22]">
         {snap.room.isPublic ? "Phòng công khai" : "Phòng riêng"} ·{" "}
         {snap.room.settings.turnSeconds ? `${snap.room.settings.turnSeconds}s mỗi lượt` : "không giới hạn thời gian"}
       </p>
       <Slots snap={snap} presence={room.presence} />
 
       {actionError && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="on-bg w-fit text-sm text-destructive">
           {actionError}
         </p>
       )}
@@ -216,7 +216,7 @@ export function RoomLobby({ code }: { code: string }) {
           >
             {busy === "start" ? "Đang bắt đầu…" : "Bắt đầu ván đấu"}
           </Button>
-          <p className="text-center text-xs text-muted-foreground" aria-live="polite">
+          <p className="on-bg mx-auto w-fit text-center text-xs text-[#4a3320]" aria-live="polite">
             {missing > 0
               ? `Cần thêm ${missing} người chơi.`
               : !everyoneReady
@@ -238,7 +238,7 @@ export function RoomLobby({ code }: { code: string }) {
 
       <Button
         variant="ghost"
-        className="h-10 self-center rounded-xl text-muted-foreground"
+        className="on-bg h-10 self-center text-[#4a3320] hover:bg-[#fffaf0]"
         disabled={busy !== null}
         onClick={() =>
           act("leave", async () => {

@@ -9,6 +9,20 @@ Vietnamese board game for 2, 3 or 4 players. Next.js (App Router) + Supabase, de
   **The create/join buttons are currently hidden**; set `NEXT_PUBLIC_ENABLE_ONLINE_ROOMS=true` (build time) to show them.
   The API, pages and tests are untouched, so existing invite links still work.
 
+### Background
+
+The game-wide artwork is `public/images/bg.jpg`, drawn by a fixed `body::before` layer in `globals.css`
+(not `background-attachment: fixed`, which iOS ignores). Text that sits directly on the art uses the
+`.on-bg` cream plate so it stays readable; cards and the board have their own backgrounds.
+
+### Turn clock
+
+Local and bot games give each person **10 seconds per turn** (`TURN_SECONDS` in `src/features/game/timer.ts`).
+The clock runs only while a person can act: it pauses while pieces are moving and during a bot's turn.
+When it reaches zero the first legal move is played for them (the same default move the server uses for
+online rooms) and the history marks it with ⏱. Online rooms have their own server-enforced timer, now
+including a 10 s option.
+
 ### Bots
 
 `src/features/game/bot.ts` (pure, seedable): *easy* plays a random legal move, *medium* picks the best
