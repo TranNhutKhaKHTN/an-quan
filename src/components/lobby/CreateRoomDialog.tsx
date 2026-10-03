@@ -11,6 +11,7 @@ import { ApiError, newIdempotencyKey } from "@/lib/api/client";
 
 const TIMERS = [
   { value: 0, label: "Không giới hạn" },
+  { value: 10, label: "10 giây" },
   { value: 30, label: "30 giây" },
   { value: 60, label: "60 giây" },
 ];

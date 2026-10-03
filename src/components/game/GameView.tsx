@@ -1,15 +1,14 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { MotionConfig } from "framer-motion";
 import type { Frame } from "@/features/game/animation";
 import { scores, type Direction, type EndReason, type GameState } from "@/features/game/engine";
-import { boardGeometry } from "@/features/game/geometry";
 import type { HistoryItem } from "@/features/game/history";
 import { defaultPlayers, type PlayerInfo } from "@/features/game/players";
 import { GameBoard } from "./GameBoard";
-import { DirectionPicker, GameControls } from "./GameControls";
+import { GameControls } from "./GameControls";
 import { GameHistory } from "./GameHistory";
 import { GameResultDialog } from "./GameResultDialog";
 import { RulesDialog } from "./RulesDialog";
@@ -26,6 +25,8 @@ export interface GameViewProps {
   players?: PlayerInfo[];
   youSeat?: number | null;
   secondsLeft?: number | null;
+  /** Full length of a turn, for the countdown bar. */
+  turnSeconds?: number;
   /** One line under the board when no house is selected. */
   statusText: string;
   /** Header content (mode switcher, room code...). */
@@ -57,27 +58,17 @@ export function GameView(p: GameViewProps) {
   const [dismissedKey, setDismissedKey] = useState<string | number | null>(null);
   const finished = state.status === "finished";
   const players = p.players ?? defaultPlayers(state.config.playerCount);
-  const turnName = players[state.turn]?.name;
 
-  const angles = useMemo(() => {
-    const geo = boardGeometry(state.config);
-    const n = state.cells.length;
-    const out = { 1: 0, [-1]: 0 } as Record<Direction, number>;
-    if (p.selected === null) return out;
-    for (const d of [1, -1] as Direction[]) {
-      const a = geo.positions[p.selected];
-      const b = geo.positions[(p.selected + d + n) % n];
-      out[d] = (Math.atan2((b.y - a.y) / geo.aspect, b.x - a.x) * 180) / Math.PI;
-    }
-    return out;
-  }, [p.selected, state.config, state.cells.length]);
+  // arrows appear beside the chosen house; nothing to reach for below the board
+  const choosingDirection = !finished && p.selected !== null && !p.animating && p.controllableSeat !== null;
+  const statusLine = choosingDirection ? "Chọn hướng rải bằng mũi tên hai bên ô vừa chọn." : p.statusText;
 
   return (
     <MotionConfig reducedMotion="user">
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 lg:grid lg:grid-cols-[1fr_320px] lg:items-start">
         <section className="flex flex-col gap-4">
           <header className="flex items-center justify-between gap-2">
-            <Link href="/" className="text-lg font-extrabold text-[#6b4423]">
+            <Link href="/" className="on-bg text-lg font-extrabold text-[#6b4423]">
               Ô Ăn Quan
             </Link>
             {p.headerExtra}
@@ -94,24 +85,17 @@ export function GameView(p: GameViewProps) {
             controllableSeat={p.controllableSeat}
             hand={p.frame.hand}
             floaters={p.frame.floaters}
-            onSelect={(cell) => p.onSelect(p.selected === cell ? null : cell)}
+            onSelect={(cell) => {
+              p.onSelect(p.selected === cell ? null : cell);
+            }}
+            onPickDirection={choosingDirection ? p.onPlay : undefined}
             secondsLeft={p.secondsLeft}
+            turnSeconds={p.turnSeconds}
             players={players}
           />
 
-          <div className="min-h-[5.5rem]">
-            {!finished && p.selected !== null && !p.animating && p.controllableSeat !== null ? (
-              <DirectionPicker
-                angles={angles}
-                disabled={p.animating}
-                onPick={p.onPlay}
-                hint={`${turnName}: chọn hướng rải từ ô ${p.selected}`}
-              />
-            ) : (
-              <p className="text-center text-sm text-muted-foreground" aria-live="polite">
-                {p.statusText}
-              </p>
-            )}
+          <div className="min-h-10" aria-live="polite">
+            <p className="on-bg mx-auto w-fit max-w-full text-center text-sm text-[#4a3320]">{statusLine}</p>
           </div>
 
           <GameControls

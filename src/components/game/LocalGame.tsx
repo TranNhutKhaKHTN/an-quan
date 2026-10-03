@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import Link from "next/link";
+import { SfxLink } from "@/components/common/SfxLink";
 import { useRouter } from "next/navigation";
 import { useReducedMotion } from "framer-motion";
 import { BOT_LEVELS, chooseMove, type BotLevel } from "@/features/game/bot";
 import type { PlayerCount } from "@/features/game/engine";
+import { defaultMove } from "@/features/game/engine";
 import { defaultPlayers, type PlayerInfo } from "@/features/game/players";
+import { useSound } from "@/features/audio/soundStore";
 import { useLocalGame } from "@/features/game/store/localGameStore";
 import { SEAT_AVATARS, seatName } from "@/features/game/theme";
+import { TURN_SECONDS } from "@/features/game/timer";
+import { useCountdown } from "@/hooks/useCountdown";
 import { GameView } from "./GameView";
 
 const HUMAN_SEAT = 0;
@@ -25,6 +29,7 @@ export function LocalGame({ players, botLevel }: Props) {
   const router = useRouter();
   const reduced = useReducedMotion();
   const g = useLocalGame();
+  const sound = useSound();
   const vsBot = botLevel !== undefined;
 
   useEffect(() => {
@@ -54,6 +59,26 @@ export function LocalGame({ players, botLevel }: Props) {
     return () => clearTimeout(t);
   }, [botTurn, botLevel, state.version, state.moveCount, reduced]);
 
+  // 10 s clock for people (bots answer on their own). It stops while pieces are moving.
+  const humanTurn = !finished && !g.animating && (!vsBot || state.turn === HUMAN_SEAT);
+  const deadline = g.turnDeadline;
+  const secondsLeft = useCountdown(deadline, humanTurn && deadline !== null, TURN_SECONDS);
+
+  // time is up: play the first legal move for them, exactly like the server does online
+  useEffect(() => {
+    if (!humanTurn || deadline === null) return;
+    const t = setTimeout(
+      () => {
+        const s = useLocalGame.getState();
+        if (s.turnDeadline !== deadline || s.animating || s.state.status !== "playing") return;
+        const move = defaultMove(s.state);
+        if (move) void s.playMove(move, "timeout");
+      },
+      Math.max(0, deadline - Date.now()),
+    );
+    return () => clearTimeout(t);
+  }, [humanTurn, deadline]);
+
   const playerInfo = useMemo<PlayerInfo[]>(
     () =>
       vsBot
@@ -67,7 +92,7 @@ export function LocalGame({ players, botLevel }: Props) {
   );
 
   if (state.config.playerCount !== players)
-    return <div className="p-10 text-center text-muted-foreground">Đang chuẩn bị bàn cờ…</div>;
+    return <div className="on-bg mx-auto my-10 w-fit p-4 text-center text-[#4a3320]">Đang chuẩn bị bàn cờ…</div>;
 
   const base = vsBot ? "/play/bot" : "/play/local";
   const query = (n: number, level?: BotLevel) => `${base}?players=${n}${level ? `&level=${level}` : ""}`;
@@ -99,28 +124,30 @@ export function LocalGame({ players, botLevel }: Props) {
       history={g.history}
       players={playerInfo}
       statusText={statusText}
+      secondsLeft={secondsLeft}
+      turnSeconds={TURN_SECONDS}
       headerExtra={
         <div className="flex flex-col items-end gap-1.5 sm:flex-row sm:items-center">
           {vsBot && (
             <nav className="flex gap-1 rounded-full bg-secondary p-1 text-sm" aria-label="Độ khó">
               {BOT_LEVELS.map((l) => (
-                <Link key={l.level} href={query(players, l.level)} className={pill(l.level === botLevel)} aria-current={l.level === botLevel}>
+                <SfxLink key={l.level} href={query(players, l.level)} className={pill(l.level === botLevel)} aria-current={l.level === botLevel}>
                   {l.label}
-                </Link>
+                </SfxLink>
               ))}
             </nav>
           )}
           <nav className="flex gap-1 rounded-full bg-secondary p-1 text-sm" aria-label="Số người chơi">
             {([2, 3, 4] as const).map((n) => (
-              <Link key={n} href={query(n, botLevel)} className={pill(n === players)} aria-current={n === players}>
+              <SfxLink key={n} href={query(n, botLevel)} className={pill(n === players)} aria-current={n === players}>
                 {n} người
-              </Link>
+              </SfxLink>
             ))}
           </nav>
         </div>
       }
-      soundOn={g.soundOn}
-      onToggleSound={g.toggleSound}
+      soundOn={sound.on}
+      onToggleSound={sound.toggle}
       onSelect={g.select}
       onPlay={(d) => g.play(d)}
       canSurrender={vsBot ? !humanEliminated : true}

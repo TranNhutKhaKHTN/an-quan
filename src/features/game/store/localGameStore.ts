@@ -13,7 +13,9 @@ import {
 } from "../engine";
 import { playEvents, type Floater } from "../animation";
 import { gainedBy, type HistoryItem } from "../history";
+import { useSound } from "@/features/audio/soundStore";
 import { sfx } from "../sound";
+import { turnDeadline } from "../timer";
 
 interface LocalGameStore {
   state: GameState;
@@ -25,9 +27,10 @@ interface LocalGameStore {
   selected: number | null;
   animating: boolean;
   history: HistoryItem[];
+  /** When the current turn runs out (ms epoch); null before the first start, after the end, or while paused. */
+  turnDeadline: number | null;
   /** Increments on every new game; lets the UI reset per-game state. */
   gameId: number;
-  soundOn: boolean;
   /** Set to true to skip step delays (reduced motion). */
   instant: boolean;
 
@@ -35,13 +38,14 @@ interface LocalGameStore {
   select: (cell: number | null) => void;
   play: (direction: Direction) => Promise<void>;
   /** Plays a complete move (used by bots): selects the house, then sows. */
-  playMove: (move: Move) => Promise<void>;
+  playMove: (move: Move, kind?: "move" | "timeout") => Promise<void>;
   surrender: (seat: Seat) => void;
-  toggleSound: () => void;
   setInstant: (v: boolean) => void;
 }
 
 let runId = 0;
+/** How the next move is recorded in the history (a timeout is shown differently). */
+let nextKind: "move" | "timeout" = "move";
 
 function fresh(players: PlayerCount) {
   const state = createGame(players);
@@ -57,15 +61,17 @@ function fresh(players: PlayerCount) {
   };
 }
 
+const startFresh = (players: PlayerCount) => ({ ...fresh(players), turnDeadline: turnDeadline() });
+
 export const useLocalGame = create<LocalGameStore>((set, get) => ({
   ...fresh(2),
+  turnDeadline: null,
   gameId: 0,
-  soundOn: true,
   instant: false,
 
   start: (players) => {
     runId++;
-    set({ ...fresh(players), gameId: get().gameId + 1 });
+    set({ ...startFresh(players), gameId: get().gameId + 1 });
   },
 
   select: (cell) => {
@@ -74,7 +80,6 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
     set({ selected: cell !== null && state.cells[cell]?.dan > 0 ? cell : null });
   },
 
-  toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
   setInstant: (instant) => set({ instant }),
 
   surrender: (seat) => {
@@ -86,22 +91,34 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
       cells: result.state.cells,
       captured: result.state.captured,
       selected: null,
+      // if the surrendering seat was on turn, the next player gets a fresh clock
+      turnDeadline:
+        result.state.status !== "playing"
+          ? null
+          : result.state.turn !== state.turn
+            ? turnDeadline()
+            : get().turnDeadline,
     });
   },
 
-  playMove: async (move) => {
+  playMove: async (move, kind = "move") => {
     const { state, animating } = get();
     if (animating || state.status !== "playing" || move.seat !== state.turn) return;
+    nextKind = kind;
     set({ selected: move.cell });
     await get().play(move.direction);
   },
 
   play: async (direction) => {
-    const { state, selected, animating, soundOn, instant } = get();
+    const { state, selected, animating, instant } = get();
+    const soundOn = useSound.getState().on;
     if (animating || selected === null || state.status !== "playing") return;
     const me = ++runId;
+    const kind = nextKind;
+    nextKind = "move";
     const result = applyMove(state, { seat: state.turn, cell: selected, direction }, state.version);
-    set({ animating: true, selected: null });
+    // no clock while the pieces are moving; the next turn's clock starts when they stop
+    set({ animating: true, selected: null, turnDeadline: null });
 
     const done = await playEvents(state, result.events, {
       get: () => get(),
@@ -119,6 +136,7 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
       captured: next.captured,
       hand: null,
       animating: false,
+      turnDeadline: next.status === "playing" ? turnDeadline() : null,
       history: [
         ...get().history,
         {
@@ -126,6 +144,7 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
           seat: state.turn,
           cell: selected,
           direction,
+          kind,
           gained: gainedBy(result.events, state.config),
         },
       ],

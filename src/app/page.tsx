@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SfxLink } from "@/components/common/SfxLink";
 import { Bot, Play } from "lucide-react";
 import { HomeActions } from "@/components/common/HomeActions";
 
@@ -16,14 +16,14 @@ export default function Home() {
           ♜
         </div>
         <h1 className="text-5xl font-extrabold tracking-tight text-[#6b4423] sm:text-6xl">Ô Ăn Quan</h1>
-        <p className="mt-2 text-muted-foreground">Trò chơi dân gian Việt Nam cho 2, 3 hoặc 4 người</p>
+        <p className="on-bg mt-3 inline-block text-[#5a3d22]">Trò chơi dân gian Việt Nam cho 2, 3 hoặc 4 người</p>
       </div>
 
       <section className="w-full space-y-3" aria-label="Chơi với máy">
-        <h2 className="text-lg font-bold text-[#6b4423]">Chơi với máy</h2>
+        <h2 className="on-bg inline-block text-lg font-bold text-[#6b4423]">Chơi với máy</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           {modes.map((m) => (
-            <Link
+            <SfxLink
               key={m.n}
               href={`/play/bot?players=${m.n}&level=medium`}
               className="wood-board group rounded-3xl p-5 text-[#fff6e0] transition-transform hover:-translate-y-1 focus-visible:ring-4 focus-visible:ring-primary/50 focus-visible:outline-none"
@@ -33,16 +33,16 @@ export default function Home() {
                 <Bot className="size-4" /> Bạn + {m.n - 1} máy
               </div>
               <div className="text-sm opacity-90">{m.desc}</div>
-            </Link>
+            </SfxLink>
           ))}
         </div>
       </section>
 
       <section className="w-full space-y-3" aria-label="Chơi chung một máy">
-        <h2 className="text-lg font-bold text-[#6b4423]">Chơi chung một máy</h2>
+        <h2 className="on-bg inline-block text-lg font-bold text-[#6b4423]">Chơi chung một máy</h2>
         <div className="grid gap-3 sm:grid-cols-3">
         {modes.map((m) => (
-          <Link
+          <SfxLink
             key={m.n}
             href={`/play/local?players=${m.n}`}
             className="wood-board group rounded-3xl p-5 text-[#fff6e0] transition-transform hover:-translate-y-1 focus-visible:ring-4 focus-visible:ring-primary/50 focus-visible:outline-none"
@@ -52,7 +52,7 @@ export default function Home() {
               <Play className="size-4" /> {m.title}
             </div>
             <div className="text-sm opacity-90">{m.desc}</div>
-          </Link>
+          </SfxLink>
         ))}
         </div>
       </section>

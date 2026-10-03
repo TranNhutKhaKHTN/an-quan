@@ -9,6 +9,30 @@ Vietnamese board game for 2, 3 or 4 players. Next.js (App Router) + Supabase, de
   **The create/join buttons are currently hidden**; set `NEXT_PUBLIC_ENABLE_ONLINE_ROOMS=true` (build time) to show them.
   The API, pages and tests are untouched, so existing invite links still work.
 
+### Background
+
+The game-wide artwork is `public/images/bg.jpg`, drawn by a fixed `body::before` layer in `globals.css`
+(not `background-attachment: fixed`, which iOS ignores). Text that sits directly on the art uses the
+`.on-bg` cream plate so it stays readable; cards and the board have their own backgrounds.
+
+### Audio
+
+* **Background music:** `public/audio.m4a`, looped by `src/components/common/BackgroundMusic.tsx` (root layout, so it
+  survives page changes). Browsers block autoplay, so it starts on the first tap; the round button bottom-right
+  mutes it and the choice is remembered (`aq:music`).
+* **Select sound:** `public/sfx/select.wav`, the audio track of `public/select.mp4` (trimmed to start at the first audible sample, ~0.9 s),
+  played when choosing a game mode or a difficulty / player count (not when picking a house). Sowing and capture sounds are
+  synthesised in `src/features/game/sound.ts`.
+* The **Âm thanh** button controls all sound effects (not the music) and is remembered (`aq:sfx`).
+
+### Turn clock
+
+Local and bot games give each person **10 seconds per turn** (`TURN_SECONDS` in `src/features/game/timer.ts`).
+The clock runs only while a person can act: it pauses while pieces are moving and during a bot's turn.
+When it reaches zero the first legal move is played for them (the same default move the server uses for
+online rooms) and the history marks it with ⏱. Online rooms have their own server-enforced timer, now
+including a 10 s option.
+
 ### Bots
 
 `src/features/game/bot.ts` (pure, seedable): *easy* plays a random legal move, *medium* picks the best
