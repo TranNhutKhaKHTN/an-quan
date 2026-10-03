@@ -89,6 +89,15 @@ Supabase project (real Auth, Realtime, PostgREST). Smoke-test that once after de
 Routes declare `runtime = "nodejs"`; each request does a handful of short queries, well inside Vercel limits.
 Reads retry on transient network errors; writes are never blindly retried server-side (clients retry with idempotency keys).
 
+## Share previews (Open Graph)
+
+Sharing the site or a room invite link shows a title, description and a 1200x630 image.
+The image is `src/app/opengraph-image.png` (also copied to `twitter-image.png`); regenerate it after
+editing the design with `node scripts/generate-og-image.mjs` (rendered by Chromium so Vietnamese
+diacritics are exact). Set `NEXT_PUBLIC_SITE_URL` to your public origin; on Vercel it falls back to
+the deployment URL. Invite pages (`/lobby/CODE`) are `noindex`. Chat apps cache previews, so after
+changing the image use their debugger/refresh tool (for example Facebook's Sharing Debugger).
+
 ## Online flow
 
 1. Home → **Tạo phòng**: name, avatar, 2 or 3 players, public/private, turn timer.

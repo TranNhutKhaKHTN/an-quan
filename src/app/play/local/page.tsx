@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LocalGame } from "@/components/game/LocalGame";
 import type { PlayerCount } from "@/features/game/engine";
 
-export const metadata: Metadata = { title: "Chơi tại máy · Ô Ăn Quan" };
+export const metadata: Metadata = { title: "Chơi tại máy" };
 
 export default async function LocalPlayPage({ searchParams }: PageProps<"/play/local">) {
   const raw = Number((await searchParams).players);

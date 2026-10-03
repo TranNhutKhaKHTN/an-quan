@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ô Ăn Quan",
-  description: "Trò chơi dân gian Ô Ăn Quan cho 2, 3 hoặc 4 người chơi.",
+  metadataBase: siteUrl(),
+  title: { default: "Ô Ăn Quan | Trò chơi dân gian Việt Nam", template: "%s · Ô Ăn Quan" },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "vi_VN",
+    title: "Ô Ăn Quan | Trò chơi dân gian Việt Nam",
+    description: SITE_DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ô Ăn Quan | Trò chơi dân gian Việt Nam",
+    description: SITE_DESCRIPTION,
+  },
 };
+
+export const viewport: Viewport = { themeColor: "#fbf5e6" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

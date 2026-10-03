@@ -3,7 +3,7 @@ import { LocalGame } from "@/components/game/LocalGame";
 import type { BotLevel } from "@/features/game/bot";
 import type { PlayerCount } from "@/features/game/engine";
 
-export const metadata: Metadata = { title: "Chơi với máy · Ô Ăn Quan" };
+export const metadata: Metadata = { title: "Chơi với máy" };
 
 export default async function BotPlayPage({ searchParams }: PageProps<"/play/bot">) {
   const q = await searchParams;
