@@ -7,6 +7,7 @@ import { useReducedMotion } from "framer-motion";
 import { ConnectionBanner } from "@/components/lobby/ConnectionBanner";
 import type { Direction } from "@/features/game/engine";
 import type { PlayerInfo } from "@/features/game/players";
+import { useSound } from "@/features/audio/soundStore";
 import { useOnlineGame } from "@/features/game/store/onlineGameStore";
 import { useRoom } from "@/features/multiplayer/hooks/useRoom";
 import { roomApi } from "@/features/multiplayer/services/roomApi";
@@ -27,6 +28,7 @@ export function OnlineGame({ code }: { code: string }) {
   const reduced = useReducedMotion();
   const room = useRoom(code);
   const g = useOnlineGame();
+  const sound = useSound();
   const { snapshot: snap } = room;
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -168,8 +170,8 @@ export function OnlineGame({ code }: { code: string }) {
           {code}
         </span>
       }
-      soundOn={g.soundOn}
-      onToggleSound={g.toggleSound}
+      soundOn={sound.on}
+      onToggleSound={sound.toggle}
       onSelect={g.select}
       onPlay={(direction: Direction) => {
         if (g.selected === null || pending) return;

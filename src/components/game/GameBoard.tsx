@@ -2,11 +2,12 @@
 
 import { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { buildLayout, type Cell, type RuleConfig } from "@/features/game/engine";
+import { buildLayout, type Cell, type Direction, type RuleConfig } from "@/features/game/engine";
 import { boardGeometry } from "@/features/game/geometry";
 import type { PlayerInfo } from "@/features/game/players";
 import { seatName } from "@/features/game/theme";
 import type { Floater } from "@/features/game/animation";
+import { DirectionBubble } from "./DirectionBubble";
 import { GameHouse } from "./GameHouse";
 import { TurnIndicator } from "./TurnIndicator";
 
@@ -22,6 +23,8 @@ interface Props {
   hand: { cell: number; count: number } | null;
   floaters: Floater[];
   onSelect: (cell: number) => void;
+  /** When set, direction arrows are shown next to the selected house. */
+  onPickDirection?: (d: Direction) => void;
   secondsLeft?: number | null;
   turnSeconds?: number;
   players?: PlayerInfo[];
@@ -38,6 +41,7 @@ export function GameBoard({
   hand,
   floaters,
   onSelect,
+  onPickDirection,
   secondsLeft,
   turnSeconds,
   players,
@@ -82,6 +86,10 @@ export function GameBoard({
           />
         );
       })}
+
+      {onPickDirection && selected !== null && (
+        <DirectionBubble key={selected} geo={geo} cell={selected} onPick={onPickDirection} />
+      )}
 
       {hand && hand.count > 0 && (
         <motion.div

@@ -15,6 +15,16 @@ The game-wide artwork is `public/images/bg.jpg`, drawn by a fixed `body::before`
 (not `background-attachment: fixed`, which iOS ignores). Text that sits directly on the art uses the
 `.on-bg` cream plate so it stays readable; cards and the board have their own backgrounds.
 
+### Audio
+
+* **Background music:** `public/audio.m4a`, looped by `src/components/common/BackgroundMusic.tsx` (root layout, so it
+  survives page changes). Browsers block autoplay, so it starts on the first tap; the round button bottom-right
+  mutes it and the choice is remembered (`aq:music`).
+* **Select sound:** `public/sfx/select.wav`, the audio track of `public/select.mp4` (trimmed to start at the first audible sample, ~0.9 s),
+  played when choosing a game mode or a difficulty / player count (not when picking a house). Sowing and capture sounds are
+  synthesised in `src/features/game/sound.ts`.
+* The **Âm thanh** button controls all sound effects (not the music) and is remembered (`aq:sfx`).
+
 ### Turn clock
 
 Local and bot games give each person **10 seconds per turn** (`TURN_SECONDS` in `src/features/game/timer.ts`).

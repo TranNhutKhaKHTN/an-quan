@@ -1,40 +1,8 @@
 "use client";
 
-import { ArrowRight, BookOpen, Flag, LogOut, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { BookOpen, Flag, LogOut, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import type { Direction } from "@/features/game/engine";
-
-interface DirectionProps {
-  /** Screen angle (degrees) of the arrow for each direction. */
-  angles: Record<Direction, number>;
-  disabled: boolean;
-  onPick: (d: Direction) => void;
-  hint: string;
-}
-
-/** Direction picker: arrows point the way pieces will travel on the board. */
-export function DirectionPicker({ angles, disabled, onPick, hint }: DirectionProps) {
-  return (
-    <div className="flex flex-col items-center gap-2" aria-live="polite">
-      <p className="on-bg text-sm text-[#4a3320]">{hint}</p>
-      <div className="flex gap-3">
-        {([-1, 1] as Direction[]).map((d) => (
-          <Button
-            key={d}
-            disabled={disabled}
-            onClick={() => onPick(d)}
-            className="h-12 w-28 gap-2 rounded-2xl text-base"
-            aria-label={d === 1 ? "Rải ngược chiều kim đồng hồ" : "Rải theo chiều kim đồng hồ"}
-          >
-            <ArrowRight className="size-6" style={{ transform: `rotate(${angles[d]}deg)` }} />
-            {d === 1 ? "↺" : "↻"}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 interface ControlsProps {
   soundOn: boolean;

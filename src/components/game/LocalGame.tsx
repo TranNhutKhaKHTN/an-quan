@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import Link from "next/link";
+import { SfxLink } from "@/components/common/SfxLink";
 import { useRouter } from "next/navigation";
 import { useReducedMotion } from "framer-motion";
 import { BOT_LEVELS, chooseMove, type BotLevel } from "@/features/game/bot";
 import type { PlayerCount } from "@/features/game/engine";
 import { defaultMove } from "@/features/game/engine";
 import { defaultPlayers, type PlayerInfo } from "@/features/game/players";
+import { useSound } from "@/features/audio/soundStore";
 import { useLocalGame } from "@/features/game/store/localGameStore";
 import { SEAT_AVATARS, seatName } from "@/features/game/theme";
 import { TURN_SECONDS } from "@/features/game/timer";
@@ -28,6 +29,7 @@ export function LocalGame({ players, botLevel }: Props) {
   const router = useRouter();
   const reduced = useReducedMotion();
   const g = useLocalGame();
+  const sound = useSound();
   const vsBot = botLevel !== undefined;
 
   useEffect(() => {
@@ -129,23 +131,23 @@ export function LocalGame({ players, botLevel }: Props) {
           {vsBot && (
             <nav className="flex gap-1 rounded-full bg-secondary p-1 text-sm" aria-label="Độ khó">
               {BOT_LEVELS.map((l) => (
-                <Link key={l.level} href={query(players, l.level)} className={pill(l.level === botLevel)} aria-current={l.level === botLevel}>
+                <SfxLink key={l.level} href={query(players, l.level)} className={pill(l.level === botLevel)} aria-current={l.level === botLevel}>
                   {l.label}
-                </Link>
+                </SfxLink>
               ))}
             </nav>
           )}
           <nav className="flex gap-1 rounded-full bg-secondary p-1 text-sm" aria-label="Số người chơi">
             {([2, 3, 4] as const).map((n) => (
-              <Link key={n} href={query(n, botLevel)} className={pill(n === players)} aria-current={n === players}>
+              <SfxLink key={n} href={query(n, botLevel)} className={pill(n === players)} aria-current={n === players}>
                 {n} người
-              </Link>
+              </SfxLink>
             ))}
           </nav>
         </div>
       }
-      soundOn={g.soundOn}
-      onToggleSound={g.toggleSound}
+      soundOn={sound.on}
+      onToggleSound={sound.toggle}
       onSelect={g.select}
       onPlay={(d) => g.play(d)}
       canSurrender={vsBot ? !humanEliminated : true}

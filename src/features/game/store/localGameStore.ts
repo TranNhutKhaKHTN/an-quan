@@ -13,6 +13,7 @@ import {
 } from "../engine";
 import { playEvents, type Floater } from "../animation";
 import { gainedBy, type HistoryItem } from "../history";
+import { useSound } from "@/features/audio/soundStore";
 import { sfx } from "../sound";
 import { turnDeadline } from "../timer";
 
@@ -30,7 +31,6 @@ interface LocalGameStore {
   turnDeadline: number | null;
   /** Increments on every new game; lets the UI reset per-game state. */
   gameId: number;
-  soundOn: boolean;
   /** Set to true to skip step delays (reduced motion). */
   instant: boolean;
 
@@ -40,7 +40,6 @@ interface LocalGameStore {
   /** Plays a complete move (used by bots): selects the house, then sows. */
   playMove: (move: Move, kind?: "move" | "timeout") => Promise<void>;
   surrender: (seat: Seat) => void;
-  toggleSound: () => void;
   setInstant: (v: boolean) => void;
 }
 
@@ -68,7 +67,6 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
   ...fresh(2),
   turnDeadline: null,
   gameId: 0,
-  soundOn: true,
   instant: false,
 
   start: (players) => {
@@ -82,7 +80,6 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
     set({ selected: cell !== null && state.cells[cell]?.dan > 0 ? cell : null });
   },
 
-  toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
   setInstant: (instant) => set({ instant }),
 
   surrender: (seat) => {
@@ -113,7 +110,8 @@ export const useLocalGame = create<LocalGameStore>((set, get) => ({
   },
 
   play: async (direction) => {
-    const { state, selected, animating, soundOn, instant } = get();
+    const { state, selected, animating, instant } = get();
+    const soundOn = useSound.getState().on;
     if (animating || selected === null || state.status !== "playing") return;
     const me = ++runId;
     const kind = nextKind;

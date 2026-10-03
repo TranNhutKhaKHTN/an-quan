@@ -11,6 +11,7 @@ import {
 } from "../engine";
 import { frameOf, playEvents, type Floater } from "../animation";
 import { gainedBy, type HistoryItem } from "../history";
+import { useSound } from "@/features/audio/soundStore";
 import { sfx } from "../sound";
 import type { PublicMove, RoomSnapshot } from "@/features/multiplayer/types";
 
@@ -25,11 +26,9 @@ interface OnlineGameStore {
   animating: boolean;
   selected: number | null;
   history: HistoryItem[];
-  soundOn: boolean;
   instant: boolean;
 
   select: (cell: number | null) => void;
-  toggleSound: () => void;
   setInstant: (v: boolean) => void;
   /** Reconcile with a server snapshot: animate new moves, or jump to the server state. */
   sync: (snap: RoomSnapshot) => void;
@@ -119,7 +118,8 @@ export const useOnlineGame = create<OnlineGameStore>((set, get) => {
       } catch {
         return jump(snap); // can't reproduce it locally: trust the server
       }
-      const { soundOn, instant } = get();
+      const { instant } = get();
+      const soundOn = useSound.getState().on;
       const done = await playEvents(state, result.events, {
         get: () => get(),
         set: (patch) => set(patch),
@@ -139,19 +139,17 @@ export const useOnlineGame = create<OnlineGameStore>((set, get) => {
     if (JSON.stringify(state.cells) !== JSON.stringify(session.state.cells) || state.turn !== session.state.turn)
       return jump(snap);
     set({ animating: false, shown: session.state, ...frameOf(session.state) });
-    if (session.state.status === "finished" && get().soundOn) sfx.win();
+    if (session.state.status === "finished" && useSound.getState().on) sfx.win();
   };
 
   return {
     ...empty,
-    soundOn: true,
     instant: false,
     select: (cell) => {
       const { shown, animating } = get();
       if (animating || !shown || shown.status !== "playing") return;
       set({ selected: cell !== null && shown.cells[cell]?.dan > 0 ? cell : null });
     },
-    toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
     setInstant: (instant) => set({ instant }),
     sync: (snap) => {
       chain = chain.then(() => doSync(snap)).catch(() => set({ animating: false }));
